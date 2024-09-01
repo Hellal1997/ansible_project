@@ -1,0 +1,53 @@
+---
+ - 
+  hosts: web
+  become: true
+  vars:
+   - user_name : hellal2
+   - dir_name : /home/hellal2/dir1
+   - file_name : /home/hellal2/dir1/file1
+
+  vars_prompt:
+    - name: password
+      prompt: Enter your password
+      private: yes 
+
+  tasks: 
+    - name: ensure nginx is at the latest version
+      apt: name=nginx state=latest
+    - name: "start nginx"
+      service: 
+        name: nginx
+        state: started
+
+
+    - name: create new user
+      user:
+        name: "{{ user_name }}"
+        comment: mohamed hellal
+        uid: 2003
+        group: admin
+        
+         
+    - name: create dir
+      file:
+        path: "{{ dir_name }}"
+        state: directory
+        mode: 0755    
+          
+          
+    - name : create file
+      file:
+        path: "{{ file_name }}"
+        state: touch
+        mode: 0644
+       
+       
+    - name : list content of the the directory "dir1"
+      command: "ls  {{ dir_name }} "
+      register: list
+         
+     
+    - name: print the content of directory
+      debug : 
+       var : list.stdout
